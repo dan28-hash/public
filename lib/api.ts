@@ -1,31 +1,9 @@
-import { products, categories, featuredProducts } from "./mock-data";
-import type { Product, Category } from "./types";
-
-/**
- * API Abstraction Layer
- *
- * Currently returns mock data from lib/mock-data.ts.
- * When connecting to Unchained Commerce, replace the function bodies
- * with GraphQL fetch calls to NEXT_PUBLIC_GRAPHQL_URL.
- *
- * No component changes will be needed - only this file changes.
- */
+import { products, categories, featuredProducts, mockQuotes, mockOrders, mockTeam, mockCertifications, mockAnalytics } from "./mock-data";
+import type { Product, Category, Quote, Order, QuoteItem, TeamMember, Certification, AnalyticsSummary } from "./types";
 
 // --- Products ---
 
-export async function fetchProducts(
-  categorySlug?: string
-): Promise<Product[]> {
-  // TODO: Replace with Unchained GraphQL query:
-  // query Products($categorySlug: String) {
-  //   products(tags: [$categorySlug]) {
-  //     _id
-  //     texts { title slug description }
-  //     media { file { url } }
-  //     ...
-  //   }
-  // }
-
+export async function fetchProducts(categorySlug?: string): Promise<Product[]> {
   if (categorySlug && categorySlug !== "all") {
     return products.filter((p) => p.categorySlug === categorySlug);
   }
@@ -33,46 +11,24 @@ export async function fetchProducts(
 }
 
 export async function fetchFeaturedProducts(): Promise<Product[]> {
-  // TODO: Replace with Unchained query for featured/tagged products
   return featuredProducts;
 }
 
-export async function fetchProductBySlug(
-  slug: string
-): Promise<Product | null> {
-  // TODO: Replace with Unchained GraphQL query:
-  // query Product($slug: String!) {
-  //   product(slug: $slug) { ... }
-  // }
-
+export async function fetchProductBySlug(slug: string): Promise<Product | null> {
   return products.find((p) => p.slug === slug) ?? null;
 }
 
-export async function fetchRelatedProducts(
-  categorySlug: string,
-  excludeId: string,
-  limit: number = 4
-): Promise<Product[]> {
-  // TODO: Replace with Unchained assortment query
-  return products
-    .filter((p) => p.categorySlug === categorySlug && p._id !== excludeId)
-    .slice(0, limit);
+export async function fetchRelatedProducts(categorySlug: string, excludeId: string, limit: number = 4): Promise<Product[]> {
+  return products.filter((p) => p.categorySlug === categorySlug && p._id !== excludeId).slice(0, limit);
 }
 
 // --- Categories ---
 
 export async function fetchCategories(): Promise<Category[]> {
-  // TODO: Replace with Unchained GraphQL query:
-  // query Assortments {
-  //   assortments { _id texts { title slug description } }
-  // }
-
   return categories;
 }
 
-export async function fetchCategoryBySlug(
-  slug: string
-): Promise<Category | null> {
+export async function fetchCategoryBySlug(slug: string): Promise<Category | null> {
   return categories.find((c) => c.slug === slug) ?? null;
 }
 
@@ -85,14 +41,67 @@ export async function submitContactForm(data: {
   phone?: string;
   message: string;
 }): Promise<{ success: boolean; message: string }> {
-  // TODO: Replace with actual email service or Unchained mutation
-  // Simulate network delay
   await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  // Mock success
-  console.log("Contact form submitted:", data);
   return {
     success: true,
     message: "Thank you for your inquiry. We will respond within 24 hours.",
+  };
+}
+
+// --- Quotes ---
+
+export async function submitQuote(items: QuoteItem[], userId: string, userName: string, userCompany: string, userEmail: string, notes: string): Promise<{ success: boolean; quoteId: string }> {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  return { success: true, quoteId: "QT-" + Date.now() };
+}
+
+export async function fetchUserQuotes(userId: string): Promise<Quote[]> {
+  return mockQuotes.filter((q) => q.userId === userId || userId === "user-001");
+}
+
+export async function fetchQuoteById(id: string): Promise<Quote | null> {
+  return mockQuotes.find((q) => q._id === id) ?? null;
+}
+
+export async function fetchAllQuotes(): Promise<Quote[]> {
+  return mockQuotes;
+}
+
+// --- Orders ---
+
+export async function fetchUserOrders(userId: string): Promise<Order[]> {
+  return mockOrders;
+}
+
+// --- Team ---
+
+export async function fetchTeamMembers(): Promise<TeamMember[]> {
+  return mockTeam;
+}
+
+// --- Certifications ---
+
+export async function fetchCertifications(): Promise<Certification[]> {
+  return mockCertifications;
+}
+
+// --- Analytics ---
+
+export async function fetchAnalytics(): Promise<AnalyticsSummary> {
+  return mockAnalytics;
+}
+
+// --- Brochure ---
+
+export async function submitBrochureRequest(data: {
+  name: string;
+  email: string;
+  company: string;
+  phone?: string;
+}): Promise<{ success: boolean; message: string }> {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  return {
+    success: true,
+    message: "Your brochure download link has been sent to your email.",
   };
 }
